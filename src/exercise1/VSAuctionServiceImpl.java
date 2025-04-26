@@ -14,7 +14,6 @@ public class VSAuctionServiceImpl implements VSAuctionService {
             }
         }
         auctionList.put(auction, handler);
-
         new Thread (() -> {
             try {
                 Thread.sleep(duration * 1000L);

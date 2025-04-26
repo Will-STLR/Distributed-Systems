@@ -8,24 +8,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
 public class VSAuctionRMIClient {
-
     // CLASS VARIABLES
-
     private static VSAuctionService auctionService;
     private static VSAuctionEventHandler auctionEventHandler;
 
     // METHODS
-
-    public static void main(String[] args) throws NotBoundException, RemoteException, VSAuctionException, InterruptedException {
-        // Get VSAuctionService
-        Registry registry = LocateRegistry.getRegistry("localhost", 12345);
-        auctionService = (VSAuctionService) registry.lookup("auctionService");
-        // Register auction event handler
-        auctionEventHandler = new VSAuctionEventHandlerImpl();
-        UnicastRemoteObject.exportObject(auctionEventHandler, 0);
-        runShell();
-    }
-
     private static void runShell() throws VSAuctionException, InterruptedException, RemoteException {
         Scanner scanner = new Scanner(System.in);
 
@@ -40,24 +27,14 @@ public class VSAuctionRMIClient {
             scanner.nextLine();
 
             switch (choice) {
-                case 1:
-                    registerAuction(scanner);
-                    break;
-                case 2:
-                    viewAuctions();
-                    break;
-                case 3:
-                    placeBid(scanner);
-                    break;
-                case 4:
-                    System.out.println("Exiting...");
-                    return;
-                default:
-                    System.out.println("Invalid option. Try again.");
+                case 1 -> registerAuction(scanner);
+                case 2 -> viewAuctions();
+                case 3 -> placeBid(scanner);
+                case 4 -> System.out.println("Exiting...");
+                default -> System.out.println("Invalid option. Try again.");
             }
         }
     }
-
     private static void registerAuction(Scanner scanner) throws VSAuctionException, InterruptedException, RemoteException {
         System.out.println("Enter auction name:");
         String auctionName = scanner.nextLine();
@@ -70,14 +47,12 @@ public class VSAuctionRMIClient {
 
         auctionService.registerAuction(auction, duration, auctionEventHandler);
     }
-
     private static void viewAuctions() throws RemoteException {
         VSAuction[] array = auctionService.getAuctions();
         for (VSAuction auction : array) {
             System.out.println(auction.getName() + ": " + auction.getPrice());
         }
     }
-
     private static void placeBid(Scanner scanner) throws VSAuctionException, RemoteException {
         System.out.println("Enter your username:");
         String userName = scanner.nextLine();
@@ -94,5 +69,15 @@ public class VSAuctionRMIClient {
         reply = auctionService.placeBid(userName, auctionName, bidAmount, auctionEventHandler);
 
         System.out.println("Highest Bid?:" + reply);
+    }
+
+    public static void main(String[] args) throws NotBoundException, RemoteException, VSAuctionException, InterruptedException {
+        // Get VSAuctionService
+        Registry registry = LocateRegistry.getRegistry("localhost", 12345);
+        auctionService = (VSAuctionService) registry.lookup("auctionService");
+        // Register auction event handler
+        auctionEventHandler = new VSAuctionEventHandlerImpl();
+        UnicastRemoteObject.exportObject(auctionEventHandler, 0);
+        runShell();
     }
 }

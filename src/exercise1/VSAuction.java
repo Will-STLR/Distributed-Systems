@@ -3,7 +3,7 @@ package exercise1;
 import java.io.Serializable;
 
 public class VSAuction implements Serializable {
-    // CLASS VARIABLES
+    // INSTANC/CLASS VARIABLES
     private final String name;
     private int price = 0;
 

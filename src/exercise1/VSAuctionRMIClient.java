@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
 public class VSAuctionRMIClient {
-    // CLASS VARIABLES
+    // CLASS VARIABLES: Hier brauchen wir Klassenvariablen, da jeder Client einen EventHandler braucht.
     private static VSAuctionService auctionService;
     private static VSAuctionEventHandler auctionEventHandler;
 
@@ -75,7 +75,7 @@ public class VSAuctionRMIClient {
         // Get VSAuctionService
         Registry registry = LocateRegistry.getRegistry("localhost", 12345);
         auctionService = (VSAuctionService) registry.lookup("auctionService");
-        // Register auction event handler
+        // Auktionsdienst als Remote-Objekt exportieren: Der hoehrt auf port 0, ob eingehende anrufe da sind.
         auctionEventHandler = new VSAuctionEventHandlerImpl();
         UnicastRemoteObject.exportObject(auctionEventHandler, 0);
         runShell();

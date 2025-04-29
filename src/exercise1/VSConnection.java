@@ -22,6 +22,7 @@ public class VSConnection {
         }
     }
     public byte[] receiveChunk() {
+        // TODO: Blockieren biss agnzees PPacket vom Outputstream gekommen ist.
         ByteArrayInputStream in = new ByteArrayInputStream(new byte[0]); // TODO: Make size big enough for input
         ByteBuffer buffer = ByteBuffer.allocate(chunkLength);
         while (in.read() != -1) {

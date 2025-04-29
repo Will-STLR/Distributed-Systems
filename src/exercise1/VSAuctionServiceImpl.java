@@ -38,9 +38,9 @@ public class VSAuctionServiceImpl implements VSAuctionService {
             if (a.getName().equals(auctionName)) {
                 if (price > a.getPrice()) {
                     a.setPrice(price);
-                    auctionList.put(a, handler);
                     VSAuctionEventHandler prevWinner = auctionList.get(a);
                     prevWinner.handleEvent(VSAuctionEventType.HIGHER_BID, a);
+                    auctionList.put(a, handler);
                     return true;
                 }else {
                     return false;

@@ -1,33 +1,42 @@
 package exercise1;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class VSConnection {
-    private int chunkLength = -1;
+
+    private final Socket socket;
+    private final InputStream in;
+    private final OutputStream out;
+
+    public VSConnection(Socket socket) throws IOException {
+        this.socket = socket;
+        this.in = socket.getInputStream();
+        this.out = socket.getOutputStream();
+    }
 
     public void sendChunk(byte[] chunk) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        chunkLength = chunk.length;
-        try {
-            out.write(chunk, 0, chunk.length);
-            out.flush();
-            out.close();
-        }catch (NullPointerException | IndexOutOfBoundsException e) {
-            throw new IOException("ERROR: Chunk is empty");
-        }catch (IOException e) {
-            throw new IOException("ERROR: IO/Exception {close or flush}");
-        }
+        // Buffer erstellen mit Platz für HEADER und CHUNK.
+        // Header nötig, damit reveiceChunk() weiß, wann ein Chunk endet.
+        ByteBuffer buffer =  ByteBuffer.allocate(Integer.BYTES + chunk.length);
+        // Chunk Länge und Chunk in Buffer schreiben.
+        buffer.putInt(chunk.length);
+        buffer.put(chunk);
+        // Buffer in Stream schreiben.
+        out.write(buffer.array());
+        out.flush();
     }
-    public byte[] receiveChunk() {
-        // TODO: Blockieren biss agnzees PPacket vom Outputstream gekommen ist.
-        ByteArrayInputStream in = new ByteArrayInputStream(new byte[0]); // TODO: Make size big enough for input
-        ByteBuffer buffer = ByteBuffer.allocate(chunkLength);
-        while (in.read() != -1) {
-            buffer.put((byte) in.read());
-        }
-        return buffer.array();
+
+    public byte[] receiveChunk() throws IOException {
+        // HEADER Lesen und Speichern wie groß das Chunk ist.
+        // readNBytes() entfernt die Bytes aus dem InputStream
+        // Byte Buffer benutzt, da Konvertierung zu Int sonst Manuell gemacht werden muss. Umständlich!!!
+        int chunkLength = ByteBuffer.wrap(in.readNBytes(Integer.BYTES)).getInt();
+        // Chunk lesen und als byte[] array returnen.
+        return in.readNBytes(chunkLength);
     }
 }

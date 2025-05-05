@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class VSClient {
     public static void main(String[] args) throws ClassNotFoundException, IOException {
@@ -14,7 +13,7 @@ public class VSClient {
         VSConnection connection = new VSConnection(socket);
         VSObjectConnection objectConnection = new VSObjectConnection(connection);
 
-        Serializable[] test = {"String", 100, 100.10, new VSAuction("Auction"), new String("Test"), new int[]{1, 2, 3, 4, 5, 6,}};
+        Serializable[] test = {"String", 100, 100.10, new VSAuction("Auction"), new int[]{1, 2, 3, 4, 5, 6,}};
 
         for (Serializable object : test) {
             objectConnection.sendObject(object);

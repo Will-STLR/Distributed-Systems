@@ -8,13 +8,10 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class VSConnection {
-
-    private final Socket socket;
     private final InputStream in;
     private final OutputStream out;
 
     public VSConnection(Socket socket) throws IOException {
-        this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
     }

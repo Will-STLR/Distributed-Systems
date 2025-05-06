@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 public class VSConnection {
     private final InputStream in;
     private final OutputStream out;
+    private final int header = 4;
 
     public VSConnection(Socket socket) throws IOException {
         this.in = socket.getInputStream();
@@ -19,9 +20,11 @@ public class VSConnection {
     public void sendChunk(byte[] chunk) throws IOException {
         // Buffer erstellen mit Platz für HEADER und CHUNK.
         // Header nötig, damit reveiceChunk() weiß, wann ein Chunk endet.
-        ByteBuffer buffer =  ByteBuffer.allocate(Integer.BYTES + chunk.length);
+        // Buffer [ 132 Byte ]
+        // [00000000  00000000  00000000 01000000[4] + chunk[128]]
+        ByteBuffer buffer =  ByteBuffer.allocate(header + chunk.length);
         // Chunk Länge und Chunk in Buffer schreiben.
-        buffer.putInt(chunk.length);
+        buffer.putInt(chunk.length);  // In den Header = Chunk Größe
         buffer.put(chunk);
         // Buffer in Stream schreiben.
         out.write(buffer.array());
@@ -32,7 +35,7 @@ public class VSConnection {
         // HEADER Lesen und Speichern wie groß das Chunk ist.
         // readNBytes() entfernt die Bytes aus dem InputStream
         // Byte Buffer benutzt, da Konvertierung zu Int sonst Manuell gemacht werden muss. Umständlich!!!
-        int chunkLength = ByteBuffer.wrap(in.readNBytes(Integer.BYTES)).getInt();
+        int chunkLength = ByteBuffer.wrap(in.readNBytes(header)).getInt();
         // Chunk lesen und als byte[] array returnen.
         return in.readNBytes(chunkLength);
     }
